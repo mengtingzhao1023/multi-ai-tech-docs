@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>07 - 结果执行与导出 | 技术文档</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', 'Noto Sans SC', sans-serif; background: #F7F5F3; }
+        .doc-container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .section { background: white; border-radius: 12px; padding: 32px; margin-bottom: 24px; border: 1px solid #E8E4E0; }
+        .code-block { background: #1a1a2e; color: #eaeaea; padding: 20px; border-radius: 8px; overflow-x: auto; font-family: 'Fira Code', monospace; font-size: 14px; }
+        .format-card { border: 2px solid #E8E4E0; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+        .format-card.markdown { border-color: #A8B5A0; }
+        .format-card.pdf { border-color: #C9A9A6; }
+        .format-card.mindmap { border-color: #A8B4C4; }
+        .format-card.card { border-color: #B8A99A; }
+        .nav-link {
+            position: relative;
+            color: #8B8B8B;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #4A4A4A;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #B8A99A;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <nav class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-m-border z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <a href="../index.html" class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-m-accent to-m-sage flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="text-xl font-semibold text-m-text tracking-tight hidden sm:block">技术文档</span>
+                    </div>
+                </a>
+                
+                <!-- 导航链接 -->
+                <div class="flex items-center gap-6">
+                    <a href="../index.html" class="nav-link">返回主站</a>
+                    <a href="index.html" class="nav-link active text-m-text">文档首页</a>
+                    <a href="PRD.html" class="nav-link">PRD</a>
+                </div>
+                
+                <!-- 右侧操作区 -->
+                <div class="flex items-center gap-4">
+                    <a href="06-task-decomposition.html" class="flex items-center gap-1 text-gray-500 hover:text-m-accent transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        <span>上一篇</span>
+                    </a>
+                    <span class="text-sm text-m-text-light">07 / 08</span>
+                    <a href="08-memory-and-mcp.html" class="flex items-center gap-1 text-m-accent hover:text-m-rose transition-colors">
+                        <span>下一篇</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="doc-container pt-20">
+        <div class="text-center mb-12">
+            <div class="text-sm text-gray-500 mb-2">技术文档 07</div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">结果执行与导出</h1>
+            <p class="text-gray-600">从整理结果到可用知识：多格式导出与回写策略</p>
+            <div class="mt-4 text-sm text-gray-500">
+                <span>版本: v1.0</span> | <span>更新日期: 2026-04-10</span> | <span>状态: 已完成</span>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">一、文档概述</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">1.1 背景</h3>
+            <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                整理结果需要以用户可用的形式输出。支持多种导出格式，满足不同知识管理工具的需求，同时提供回写建议帮助用户优化原平台的收藏。
+            </p>
+
+            <h3 class="font-semibold text-gray-700 mb-3">1.2 目标</h3>
+            <ul class="text-sm text-gray-600 space-y-1">
+                <li>• 支持4种主流导出格式</li>
+                <li>• 实现导出引擎的模块化设计</li>
+                <li>• 提供间接回写策略</li>
+                <li>• 设计导出中心UI</li>
+            </ul>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">二、导出格式设计</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">2.1 格式概览</h3>
+            <p class="text-gray-600 mb-4">支持4种导出格式，满足不同场景的知识管理需求。</p>
+            
+            <div class="format-card markdown">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-lg bg-m-sage/20 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-m-sage" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800">Markdown</h4>
+                        <p class="text-xs text-gray-500">适用于 Notion、语雀、Obsidian</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="format-card pdf">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-lg bg-m-rose/20 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-m-rose" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800">PDF</h4>
+                        <p class="text-xs text-gray-500">适用于打印、归档、分享</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="format-card mindmap">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-lg bg-m-blue/20 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-m-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800">思维导图</h4>
+                        <p class="text-xs text-gray-500">适用于 XMind、幕布</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="format-card card">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-lg bg-m-accent/20 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-m-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800">知识卡片</h4>
+                        <p class="text-xs text-gray-500">适用于 Anki、Quizlet</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="font-semibold text-gray-700 mb-3">2.2 格式对比</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="p-3 text-left">格式</th>
+                            <th class="p-3 text-left">适用工具</th>
+                            <th class="p-3 text-left">特点</th>
+                            <th class="p-3 text-left">优先级</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        <tr>
+                            <td class="p-3">Markdown</td>
+                            <td class="p-3">Notion, Obsidian</td>
+                            <td class="p-3">通用、易编辑</td>
+                            <td class="p-3 text-green-600">P0</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">PDF</td>
+                            <td class="p-3">通用</td>
+                            <td class="p-3">格式固定、易分享</td>
+                            <td class="p-3 text-green-600">P0</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">思维导图</td>
+                            <td class="p-3">XMind, 幕布</td>
+                            <td class="p-3">可视化结构</td>
+                            <td class="p-3 text-yellow-600">P1</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">知识卡片</td>
+                            <td class="p-3">Anki</td>
+                            <td class="p-3">适合记忆复习</td>
+                            <td class="p-3 text-yellow-600">P1</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">三、导出引擎实现</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">3.1 核心实现</h3>
+            <div class="code-block">
+<pre>// 导出引擎
+class ExportEngine {
+  constructor() {
+    this.exporters = {
+      markdown: new MarkdownExporter(),
+      pdf: new PDFExporter(),
+      mindmap: new MindMapExporter(),
+      cards: new CardExporter()
+    };
+  }
+
+  // 主导出方法
+  async export(organizedData, format, options = {}) {
+    const exporter = this.exporters[format];
+    if (!exporter) {
+      throw new Error(`不支持的导出格式: ${format}`);
+    }
+
+    // 预处理数据
+    const processedData = await this.preprocessData(organizedData, format);
+    
+    // 执行导出
+    const result = await exporter.export(processedData, options);
+    
+    return {
+      format,
+      content: result.content,
+      filename: this.generateFilename(organizedData, format),
+      size: result.content.length
+    };
+  }
+
+  // 批量导出
+  async exportBatch(organizedDataList, format, options = {}) {
+    const results = await Promise.all(
+      organizedDataList.map(data => this.export(data, format, options))
+    );
+    
+    // 如果是多个文件，打包为zip
+    if (results.length > 1) {
+      return this.createZipArchive(results);
+    }
+    
+    return results[0];
+  }
+}</pre>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">四、间接回写策略</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">4.1 技术限制</h3>
+            <div class="bg-m-rose/10 border border-m-rose/30 rounded-lg p-4 mb-4">
+                <h4 class="font-semibold text-m-rose mb-2">限制说明</h4>
+                <p class="text-sm text-gray-600">经调研，豆包、Kimi、通义千问、DeepSeek 均未开放修改用户对话收藏的API。因此无法实现自动回写，只能提供间接方案。</p>
+            </div>
+
+            <h3 class="font-semibold text-gray-700 mb-3">4.2 回写建议生成</h3>
+            <div class="code-block">
+<pre>// 间接回写建议生成器
+class WritebackSuggestionGenerator {
+  async generateSuggestions(organizedData, targetPlatform) {
+    const suggestions = [];
+    
+    // 1. 标签优化建议
+    organizedData.dialogs.forEach(dialog => {
+      if (dialog.originalTags && dialog.optimizedTags) {
+        const added = dialog.optimizedTags.filter(t => !dialog.originalTags.includes(t));
+        const removed = dialog.originalTags.filter(t => !dialog.optimizedTags.includes(t));
+        
+        if (added.length > 0 || removed.length > 0) {
+          suggestions.push({
+            type: 'TAG_OPTIMIZATION',
+            dialogId: dialog.id,
+            title: dialog.summary,
+            action: 'UPDATE_TAGS',
+            current: dialog.originalTags,
+            suggested: dialog.optimizedTags,
+            platform: targetPlatform
+          });
+        }
+      }
+    });
+    
+    return suggestions;
+  }
+}</pre>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section bg-gradient-to-r from-m-bg to-white">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">五、总结</h2>
+            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">导出能力</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>✓ 4种导出格式</li>
+                        <li>✓ 模块化引擎</li>
+                        <li>✓ 批量导出支持</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">回写策略</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>✓ 间接回写方案</li>
+                        <li>✓ 平台操作指南</li>
+                        <li>✓ 标签优化建议</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">附录</h2>
+            
+            <h4 class="font-semibold text-gray-700 mb-2">参考文档</h4>
+            <ul class="text-sm text-gray-600 space-y-1">
+                <li>• <a href="06-task-decomposition.html" class="text-m-accent hover:underline">06 - 任务分解策略</a></li>
+                <li>• <a href="08-memory-and-mcp.html" class="text-m-accent hover:underline">08 - Memory与MCP</a></li>
+            </ul>
+
+            <h4 class="font-semibold text-gray-700 mb-2 mt-4">更新记录</h4>
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="p-2 text-left">版本</th>
+                        <th class="p-2 text-left">日期</th>
+                        <th class="p-2 text-left">更新内容</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="p-2">v1.0</td>
+                        <td class="p-2">2026-04-10</td>
+                        <td class="p-2">初始版本</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        > 💡 **提示**: 本文档定义了结果导出与回写机制，是整理引擎的输出模块。
+
+        <div class="flex justify-between items-center pt-8 border-t">
+            <a href="06-task-decomposition.html" class="text-gray-500 hover:text-m-accent flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                上一篇：任务分解策略
+            </a>
+            <a href="08-memory-and-mcp.html" class="text-m-accent hover:text-m-rose flex items-center">
+                下一篇：Memory与MCP
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

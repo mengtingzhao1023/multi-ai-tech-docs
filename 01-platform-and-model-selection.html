@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>01 - 平台选择与AI引擎模型选型 | 技术文档</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: 'Inter', 'Noto Sans SC', sans-serif; background: #F7F5F3; }
+        .doc-container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .section { background: white; border-radius: 12px; padding: 32px; margin-bottom: 24px; border: 1px solid #E8E4E0; }
+        .code-block { background: #1a1a2e; color: #eaeaea; padding: 20px; border-radius: 8px; overflow-x: auto; font-family: 'Fira Code', monospace; font-size: 14px; }
+        .highlight { background: #F5F0EB; padding: 2px 6px; border-radius: 4px; color: #B8A99A; }
+        .platform-card { border: 2px solid #E8E4E0; border-radius: 12px; padding: 20px; transition: all 0.3s; }
+        .platform-card:hover { border-color: #B8A99A; transform: translateY(-2px); }
+        .model-tier { border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+        .tier-free { background: #EDF1EB; border-left: 4px solid #A8B5A0; }
+        .tier-paid { background: #F5F0EB; border-left: 4px solid #B8A99A; }
+        .tier-custom { background: #EBEEF2; border-left: 4px solid #A8B4C4; }
+        .nav-link {
+            position: relative;
+            color: #8B8B8B;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #4A4A4A;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #B8A99A;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-m-border z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <a href="../index.html" class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-m-accent to-m-sage flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="text-xl font-semibold text-m-text tracking-tight hidden sm:block">技术文档</span>
+                    </div>
+                </a>
+                
+                <!-- 导航链接 -->
+                <div class="flex items-center gap-6">
+                    <a href="../index.html" class="nav-link">返回主站</a>
+                    <a href="index.html" class="nav-link active text-m-text">文档首页</a>
+                    <a href="PRD.html" class="nav-link">PRD</a>
+                </div>
+                
+                <!-- 右侧操作区 -->
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-m-text-light">01 / 08</span>
+                    <a href="02-data-evaluation.html" class="flex items-center gap-1 text-m-accent hover:text-m-rose transition-colors">
+                        <span>下一篇</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="doc-container pt-20">
+        <!-- 文档头部信息 -->
+        <div class="text-center mb-12">
+            <div class="text-sm text-gray-500 mb-2">技术文档 01</div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">平台选择与AI引擎模型选型</h1>
+            <p class="text-gray-600">为什么选这4个平台？AI整理引擎如何用免费模型实现核心功能？</p>
+            <div class="mt-4 text-sm text-gray-500">
+                <span>版本: v1.0</span> | <span>更新日期: 2026-04-10</span> | <span>状态: 已完成</span>
+            </div>
+        </div>
+
+        ---
+
+        <!-- 一、概述 -->
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">一、文档概述</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">1.1 背景</h3>
+            <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                在开发多平台AI对话收藏自动整理工具时，需要解决两个核心问题：一是选择支持哪些AI对话平台，二是如何设计AI整理引擎的模型选型策略。本文档详细阐述这两个关键决策的技术依据和实现方案。
+            </p>
+
+            <h3 class="font-semibold text-gray-700 mb-3">1.2 目标</h3>
+            <ul class="text-sm text-gray-600 space-y-1">
+                <li>• 明确4个平台选择的逻辑和依据</li>
+                <li>• 设计"免费为主、付费可选"的模型分层架构</li>
+                <li>• 实现模型路由与自动降级机制</li>
+            </ul>
+        </div>
+
+        ---
+
+        <!-- 二、平台选择 -->
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">二、对话来源平台选择</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">2.1 选择逻辑</h3>
+            <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                在选择支持的平台时，我们分析了国内AI对话工具的市场份额和用户画像。最终选择豆包、Kimi、千问、DeepSeek这4个平台，因为它们分别代表了不同的使用场景和用户群体，合计覆盖国内AI对话用户的80%以上。
+            </p>
+
+            <h3 class="font-semibold text-gray-700 mb-4">2.2 平台对比分析</h3>
+            <div class="grid md:grid-cols-2 gap-4 mb-6">
+                <div class="platform-card">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-m-accent to-m-sage flex items-center justify-center text-white font-bold mr-3">豆</div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800">豆包</h4>
+                            <span class="text-xs text-gray-500">字节跳动</span>
+                        </div>
+                    </div>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• <strong>优势：</strong>娱乐性强、语音交互好</li>
+                        <li>• <strong>用户：</strong>内容创作者、年轻用户</li>
+                        <li>• <strong>场景：</strong>创意写作、日常问答</li>
+                    </ul>
+                </div>
+
+                <div class="platform-card">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-kimi to-m-sage-light flex items-center justify-center text-white font-bold mr-3">K</div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800">Kimi</h4>
+                            <span class="text-xs text-gray-500">月之暗面</span>
+                        </div>
+                    </div>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• <strong>优势：</strong>长文本处理（200万字）</li>
+                        <li>• <strong>用户：</strong>分析师、研究员、律师</li>
+                        <li>• <strong>场景：</strong>文档分析、研究报告</li>
+                    </ul>
+                </div>
+
+                <div class="platform-card">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-qianwen to-m-blue flex items-center justify-center text-white font-bold mr-3">问</div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800">通义千问</h4>
+                            <span class="text-xs text-gray-500">阿里云</span>
+                        </div>
+                    </div>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• <strong>优势：</strong>企业级稳定、生态丰富</li>
+                        <li>• <strong>用户：</strong>开发者、企业用户</li>
+                        <li>• <strong>场景：</strong>代码开发、技术问答</li>
+                    </ul>
+                </div>
+
+                <div class="platform-card">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-deepseek to-m-accent flex items-center justify-center text-white font-bold mr-3">D</div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800">DeepSeek</h4>
+                            <span class="text-xs text-gray-500">深度求索</span>
+                        </div>
+                    </div>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• <strong>优势：</strong>代码能力极强、价格低</li>
+                        <li>• <strong>用户：</strong>程序员、技术人员</li>
+                        <li>• <strong>场景：</strong>编程辅助、算法设计</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 class="font-semibold text-gray-700 mb-3">2.3 平台覆盖统计</h3>
+            <div class="overflow-x-auto mb-4">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="p-3 text-left">平台</th>
+                            <th class="p-3 text-left">预估市场份额</th>
+                            <th class="p-3 text-left">用户画像</th>
+                            <th class="p-3 text-left">支持状态</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        <tr>
+                            <td class="p-3">豆包</td>
+                            <td class="p-3">25%</td>
+                            <td class="p-3">年轻用户、创作者</td>
+                            <td class="p-3 text-green-600">✅ 已支持</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">Kimi</td>
+                            <td class="p-3">20%</td>
+                            <td class="p-3">专业人士、研究员</td>
+                            <td class="p-3 text-green-600">✅ 已支持</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">通义千问</td>
+                            <td class="p-3">20%</td>
+                            <td class="p-3">开发者、企业用户</td>
+                            <td class="p-3 text-green-600">✅ 已支持</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">DeepSeek</td>
+                            <td class="p-3">15%</td>
+                            <td class="p-3">程序员、技术人员</td>
+                            <td class="p-3 text-green-600">✅ 已支持</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-semibold">合计</td>
+                            <td class="p-3 font-semibold">80%</td>
+                            <td class="p-3">-</td>
+                            <td class="p-3">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-gray-700 mb-2">2.4 为什么不选其他平台？</h4>
+                <p class="text-sm text-gray-600">
+                    文心一言、讯飞星火等平台虽然也有用户，但要么API开放程度不足，要么用户群体与上述4个平台高度重叠。从ROI角度，优先支持这4个平台可以覆盖绝大多数用户需求。
+                </p>
+            </div>
+        </div>
+
+        ---
+
+        <!-- 三、AI引擎模型选型 -->
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">三、AI整理引擎模型选型</h2>
+
+            <h3 class="font-semibold text-gray-700 mb-3">3.1 核心策略</h3>
+            <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                我们的AI整理引擎采用<strong>"免费模型处理90%场景，付费模型处理10%复杂场景"</strong>的策略。这样既能保证核心功能零成本运行，又能在需要时提供高质量的输出。
+            </p>
+
+            <h3 class="font-semibold text-gray-700 mb-4">3.2 四层模型架构</h3>
+            <div class="space-y-4 mb-6">
+                <div class="model-tier tier-free">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-semibold text-gray-800">第一层：本地规则引擎（免费）</h4>
+                        <span class="text-xs bg-white px-2 py-1 rounded">处理60%场景</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">基于用户自定义规则和关键词匹配，零成本、极速响应</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-white px-2 py-1 rounded">关键词匹配</span>
+                        <span class="text-xs bg-white px-2 py-1 rounded">正则规则</span>
+                        <span class="text-xs bg-white px-2 py-1 rounded">TF-IDF提取</span>
+                    </div>
+                </div>
+
+                <div class="model-tier tier-free">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-semibold text-gray-800">第二层：免费大模型API（免费）</h4>
+                        <span class="text-xs bg-white px-2 py-1 rounded">处理30%场景</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">利用各平台免费额度，处理需要理解的复杂场景</p>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="bg-white p-2 rounded">
+                            <strong>通义千问免费版</strong><br>
+                            分类、标签生成
+                        </div>
+                        <div class="bg-white p-2 rounded">
+                            <strong>Kimi免费版</strong><br>
+                            长文本摘要
+                        </div>
+                    </div>
+                </div>
+
+                <div class="model-tier tier-paid">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-semibold text-gray-800">第三层：低成本大模型（低成本）</h4>
+                        <span class="text-xs bg-white px-2 py-1 rounded">处理10%场景</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">复杂推理和高质量输出，成本控制在最低</p>
+                    <div class="bg-white p-2 rounded text-xs">
+                        <strong>DeepSeek V3</strong> - 推理能力强，价格仅为GPT-4的1/10
+                    </div>
+                </div>
+
+                <div class="model-tier tier-custom">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-semibold text-gray-800">扩展层：用户自定义API（用户付费）</h4>
+                        <span class="text-xs bg-white px-2 py-1 rounded">可选</span>
+                    </div>
+                    <p class="text-sm text-gray-600">提供OpenAI、Claude等付费API接入接口，用户自行配置，平台不收费</p>
+                </div>
+            </div>
+
+            <h3 class="font-semibold text-gray-700 mb-4">3.3 模型选择决策矩阵</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="p-3 text-left">任务类型</th>
+                            <th class="p-3 text-left">选用模型</th>
+                            <th class="p-3 text-left">原因</th>
+                            <th class="p-3 text-left">成本</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        <tr>
+                            <td class="p-3">关键词提取</td>
+                            <td class="p-3"><span class="highlight">本地TF-IDF</span></td>
+                            <td class="p-3">无需AI，算法即可解决</td>
+                            <td class="p-3 text-green-600">免费</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">规则匹配分类</td>
+                            <td class="p-3"><span class="highlight">本地规则引擎</span></td>
+                            <td class="p-3">用户自定义，可解释性强</td>
+                            <td class="p-3 text-green-600">免费</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">智能分类</td>
+                            <td class="p-3"><span class="highlight">通义千问免费版</span></td>
+                            <td class="p-3">中文理解好，免费额度充足</td>
+                            <td class="p-3 text-green-600">免费</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">摘要生成</td>
+                            <td class="p-3"><span class="highlight">Kimi免费版</span></td>
+                            <td class="p-3">长文本处理能力强</td>
+                            <td class="p-3 text-green-600">免费</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">复杂推理</td>
+                            <td class="p-3"><span class="highlight">DeepSeek V3</span></td>
+                            <td class="p-3">推理能力强，价格低</td>
+                            <td class="p-3 text-yellow-600">低成本</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">高质量输出</td>
+                            <td class="p-3"><span class="highlight">GPT-4o-mini（用户自选）</span></td>
+                            <td class="p-3">效果最佳，用户自行接入</td>
+                            <td class="p-3 text-gray-500">用户付费</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        ---
+
+        <!-- 四、技术实现 -->
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">四、技术实现：模型路由与降级</h2>
+
+            <h3 class="font-semibold text-gray-700 mb-3">4.1 设计目标</h3>
+            <p class="text-gray-600 text-sm mb-4">
+                为了实现"免费为主"的策略，我们设计了一个智能路由系统，根据任务复杂度和模型可用性自动选择最优方案。
+            </p>
+
+            <h3 class="font-semibold text-gray-700 mb-3">4.2 核心代码实现</h3>
+            <div class="code-block mb-4">
+<pre>// AI整理引擎核心：模型路由与降级策略
+class AIEngine {
+  constructor() {
+    // 模型优先级配置（从免费到付费）
+    this.modelChain = {
+      classification: [
+        { name: 'local-rules', cost: 0, timeout: 100 },
+        { name: 'qianwen-free', cost: 0, timeout: 2000 },
+        { name: 'deepseek-v3', cost: 0.001, timeout: 3000 }
+      ],
+      summary: [
+        { name: 'kimi-free', cost: 0, timeout: 5000 },
+        { name: 'deepseek-v3', cost: 0.001, timeout: 4000 }
+      ]
+    };
+  }
+
+  async process(task, content) {
+    const chain = this.modelChain[task];
+    
+    // 逐级尝试，失败自动降级
+    for (const model of chain) {
+      try {
+        const result = await this.callModel(model.name, content);
+        console.log(`✓ 任务完成：使用 ${model.name}，成本 ${model.cost}`);
+        return result;
+      } catch (error) {
+        console.log(`✗ ${model.name} 失败，降级到下一级...`);
+        continue;
+      }
+    }
+    
+    throw new Error('所有模型均不可用');
+  }
+
+  // 智能选择：根据内容复杂度选择模型
+  async smartSelect(content) {
+    const complexity = this.assessComplexity(content);
+    
+    if (complexity < 0.3) {
+      return 'local-rules';  // 简单内容用本地规则
+    } else if (complexity < 0.7) {
+      return 'qianwen-free'; // 中等复杂度用免费模型
+    } else {
+      return 'deepseek-v3';  // 复杂内容用付费模型（低成本）
+    }
+  }
+
+  assessComplexity(content) {
+    // 基于内容长度、专业术语密度、句子复杂度评估
+    const length = content.length;
+    const techTerms = (content.match(/API|算法|模型|代码/g) || []).length;
+    return Math.min((length / 1000 + techTerms / 10) / 2, 1);
+  }
+}</pre>
+            </div>
+
+            <h3 class="font-semibold text-gray-700 mb-3">4.3 设计亮点</h3>
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+                <ul class="text-sm text-blue-700 space-y-1">
+                    <li>• <strong>自动降级：</strong>免费模型不可用时，自动切换到低成本模型，保证服务可用性</li>
+                    <li>• <strong>成本可控：</strong>90%场景使用免费模型，整体成本趋近于零</li>
+                    <li>• <strong>扩展性强：</strong>用户可自定义接入付费API，平台不限制</li>
+                </ul>
+            </div>
+        </div>
+
+        ---
+
+        <!-- 五、思考过程 -->
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">五、思考过程：选型的权衡与决策</h2>
+
+            <div class="space-y-4">
+                <div class="border-l-4 border-m-accent pl-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">Q1: 为什么不用GPT-4作为主力？</h4>
+                    <p class="text-sm text-gray-600">
+                        GPT-4效果确实最好，但成本太高（$0.03/1K tokens）。我们的场景是高频、大批量的对话整理，如果全部用GPT-4，每月成本可能上千元。而国内免费模型的效果已经足够好，性价比更高。
+                    </p>
+                </div>
+
+                <div class="border-l-4 border-m-sage pl-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">Q2: 免费模型额度用完了怎么办？</h4>
+                    <p class="text-sm text-gray-600">
+                        我们设计了多平台轮询机制：通义千问额度用完就切Kimi，Kimi用完就切DeepSeek（低成本）。同时本地规则引擎可以处理大部分简单场景，减少对API的依赖。
+                    </p>
+                </div>
+
+                <div class="border-l-4 border-m-blue pl-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">Q3: 为什么不全部用本地模型？</h4>
+                    <p class="text-sm text-gray-600">
+                        本地模型（如Transformers.js）虽然免费，但准确率低、需要GPU、模型体积大。对于分类这种需要理解语义的复杂任务，云端大模型效果更好。我们采用"本地+云端"的混合策略，平衡成本和效果。
+                    </p>
+                </div>
+
+                <div class="border-l-4 border-m-warm pl-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">Q4: 用户自定义API的意义是什么？</h4>
+                    <p class="text-sm text-gray-600">
+                        这是产品开放性的体现。有些用户已经有OpenAI API Key，或者对输出质量有极高要求（如法律、医疗场景）。提供自定义接口，让用户自己选择，既满足了高端需求，我们又不承担成本。
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        ---
+
+        <!-- 六、总结 -->
+        <div class="section bg-gradient-to-r from-m-bg to-white">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">六、总结</h2>
+            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">平台选择</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>✓ 4平台覆盖国内80%用户</li>
+                        <li>✓ 各平台代表不同使用场景</li>
+                        <li>✓ 避免重复，ROI最优</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">模型选型</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>✓ 免费模型处理90%场景</li>
+                        <li>✓ 自动降级保证可用性</li>
+                        <li>✓ 用户可自定义付费API</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        ---
+
+        <!-- 附录 -->
+        <div class="section">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">附录</h2>
+            
+            <h4 class="font-semibold text-gray-700 mb-2">参考文档</h4>
+            <ul class="text-sm text-gray-600 space-y-1">
+                <li>• <a href="PRD.md" class="text-m-accent hover:underline">产品需求文档 (PRD)</a></li>
+                <li>• <a href="设计规范.md" class="text-m-accent hover:underline">设计规范</a></li>
+            </ul>
+
+            <h4 class="font-semibold text-gray-700 mb-2 mt-4">更新记录</h4>
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="p-2 text-left">版本</th>
+                        <th class="p-2 text-left">日期</th>
+                        <th class="p-2 text-left">更新内容</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="p-2">v1.0</td>
+                        <td class="p-2">2026-04-10</td>
+                        <td class="p-2">初始版本</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        > 💡 **提示**: 本文档是技术实现的核心参考，所有模型相关开发都应遵循此规范。
+
+        <!-- 导航 -->
+        <div class="flex justify-between items-center pt-8 border-t">
+            <a href="index.html" class="text-gray-500 hover:text-m-accent flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                返回首页
+            </a>
+            <a href="02-data-evaluation.html" class="text-m-accent hover:text-m-rose flex items-center">
+                下一篇：数据评测与效果验证
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ theme: 'default' });
+    </script>
+</body>
+</html>

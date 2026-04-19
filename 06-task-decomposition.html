@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>06 - 任务分解策略 | 技术文档</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', 'Noto Sans SC', sans-serif; background: #F7F5F3; }
+        .doc-container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .section { background: white; border-radius: 12px; padding: 32px; margin-bottom: 24px; border: 1px solid #E8E4E0; }
+        .code-block { background: #1a1a2e; color: #eaeaea; padding: 20px; border-radius: 8px; overflow-x: auto; font-family: 'Fira Code', monospace; font-size: 14px; }
+        .strategy-card { border-left: 4px solid #B8A99A; background: #FAF8F6; padding: 16px; margin-bottom: 12px; border-radius: 0 8px 8px 0; }
+        .flow-step { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .step-num { width: 28px; height: 28px; border-radius: 50%; background: #B8A99A; color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; }
+        .nav-link {
+            position: relative;
+            color: #8B8B8B;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #4A4A4A;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #B8A99A;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <nav class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-m-border z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <a href="../index.html" class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-m-accent to-m-sage flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="text-xl font-semibold text-m-text tracking-tight hidden sm:block">技术文档</span>
+                    </div>
+                </a>
+                
+                <!-- 导航链接 -->
+                <div class="flex items-center gap-6">
+                    <a href="../index.html" class="nav-link">返回主站</a>
+                    <a href="index.html" class="nav-link active text-m-text">文档首页</a>
+                    <a href="PRD.html" class="nav-link">PRD</a>
+                </div>
+                
+                <!-- 右侧操作区 -->
+                <div class="flex items-center gap-4">
+                    <a href="05-agent-design.html" class="flex items-center gap-1 text-gray-500 hover:text-m-accent transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        <span>上一篇</span>
+                    </a>
+                    <span class="text-sm text-m-text-light">06 / 08</span>
+                    <a href="07-result-execution.html" class="flex items-center gap-1 text-m-accent hover:text-m-rose transition-colors">
+                        <span>下一篇</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="doc-container pt-20">
+        <div class="text-center mb-12">
+            <div class="text-sm text-gray-500 mb-2">技术文档 06</div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">任务分解策略</h1>
+            <p class="text-gray-600">复杂任务的拆解艺术：从对话整理到多步骤执行的分解逻辑</p>
+            <div class="mt-4 text-sm text-gray-500">
+                <span>版本: v1.0</span> | <span>更新日期: 2026-04-10</span> | <span>状态: 已完成</span>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">一、文档概述</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">1.1 背景</h3>
+            <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                对话整理是一个复杂的复合任务，包含内容分析、标签分配、摘要生成等多个子任务。合理的任务分解可以提高并行度、降低复杂度、提升整体效率。
+            </p>
+
+            <h3 class="font-semibold text-gray-700 mb-3">1.2 目标</h3>
+            <ul class="text-sm text-gray-600 space-y-1">
+                <li>• 定义任务分解的核心原则</li>
+                <li>• 设计对话整理的任务流程</li>
+                <li>• 实现任务调度与执行</li>
+                <li>• 支持批量优化策略</li>
+            </ul>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">二、任务分解的核心原则</h2>
+            
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="strategy-card">
+                    <h4 class="font-semibold text-gray-800 mb-2">单一职责原则</h4>
+                    <p class="text-sm text-gray-600">每个子任务只负责一个明确的功能点，避免任务过于复杂</p>
+                </div>
+                <div class="strategy-card">
+                    <h4 class="font-semibold text-gray-800 mb-2">依赖清晰原则</h4>
+                    <p class="text-sm text-gray-600">明确子任务间的依赖关系，可并行的任务并行执行</p>
+                </div>
+                <div class="strategy-card">
+                    <h4 class="font-semibold text-gray-800 mb-2">粒度适中原则</h4>
+                    <p class="text-sm text-gray-600">任务粒度不宜过细（增加调度开销）或过粗（失去并行优势）</p>
+                </div>
+                <div class="strategy-card">
+                    <h4 class="font-semibold text-gray-800 mb-2">可回滚原则</h4>
+                    <p class="text-sm text-gray-600">每个子任务独立可回滚，失败时只需重试失败部分</p>
+                </div>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">三、对话整理任务的分解流程</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">3.1 流程设计</h3>
+            <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                <div class="flow-step">
+                    <div class="step-num">1</div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-gray-800">输入解析</h4>
+                        <p class="text-sm text-gray-600">解析用户输入，识别对话来源、数量、格式</p>
+                    </div>
+                </div>
+                <div class="ml-3 border-l-2 border-gray-300 pl-8 mb-2">
+                    <p class="text-xs text-gray-500">输出：标准化对话列表</p>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-num">2</div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-gray-800">内容分析</h4>
+                        <p class="text-sm text-gray-600">分析每个对话的意图、主题、实体、情感</p>
+                    </div>
+                </div>
+                <div class="ml-3 border-l-2 border-gray-300 pl-8 mb-2">
+                    <p class="text-xs text-gray-500">输出：对话分析报告（可并行）</p>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-num">3</div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-gray-800">标签分配</h4>
+                        <p class="text-sm text-gray-600">基于分析结果，为对话分配统一标签</p>
+                    </div>
+                </div>
+                <div class="ml-3 border-l-2 border-gray-300 pl-8 mb-2">
+                    <p class="text-xs text-gray-500">输出：带标签的对话（依赖步骤2）</p>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-num">4</div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-gray-800">摘要生成</h4>
+                        <p class="text-sm text-gray-600">为每个对话生成摘要，提取核心要点</p>
+                    </div>
+                </div>
+                <div class="ml-3 border-l-2 border-gray-300 pl-8 mb-2">
+                    <p class="text-xs text-gray-500">输出：对话摘要（可并行）</p>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-num">5</div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-gray-800">结果整合</h4>
+                        <p class="text-sm text-gray-600">整合所有子任务结果，生成最终整理报告</p>
+                    </div>
+                </div>
+                <div class="ml-3 border-l-2 border-gray-300 pl-8">
+                    <p class="text-xs text-gray-500">输出：完整的整理结果</p>
+                </div>
+            </div>
+
+            <h3 class="font-semibold text-gray-700 mb-3">3.2 依赖关系表</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="p-3 text-left">步骤</th>
+                            <th class="p-3 text-left">任务名称</th>
+                            <th class="p-3 text-left">依赖步骤</th>
+                            <th class="p-3 text-left">可并行</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        <tr>
+                            <td class="p-3">1</td>
+                            <td class="p-3">输入解析</td>
+                            <td class="p-3">无</td>
+                            <td class="p-3 text-red-600">否</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">2</td>
+                            <td class="p-3">内容分析</td>
+                            <td class="p-3">步骤1</td>
+                            <td class="p-3 text-green-600">是</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">3</td>
+                            <td class="p-3">标签分配</td>
+                            <td class="p-3">步骤2</td>
+                            <td class="p-3 text-green-600">是</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">4</td>
+                            <td class="p-3">摘要生成</td>
+                            <td class="p-3">步骤2</td>
+                            <td class="p-3 text-green-600">是</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">5</td>
+                            <td class="p-3">结果整合</td>
+                            <td class="p-3">步骤3,4</td>
+                            <td class="p-3 text-red-600">否</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">四、任务调度执行</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">4.1 调度器设计</h3>
+            <div class="code-block">
+<pre>// 任务调度器
+class TaskScheduler {
+  constructor(maxConcurrency = 5) {
+    this.maxConcurrency = maxConcurrency;
+    this.running = new Set();
+    this.completed = new Set();
+    this.failed = new Map();
+  }
+
+  // 执行所有任务
+  async execute(tasks) {
+    const dependencyGraph = this.buildDependencyGraph(tasks);
+    const results = new Map();
+    
+    while (this.completed.size < tasks.length) {
+      // 获取可执行的任务
+      const executable = this.getExecutableTasks(tasks, dependencyGraph);
+      
+      if (executable.length === 0 && this.running.size === 0) {
+        throw new Error('任务依赖死锁');
+      }
+      
+      // 批量执行任务
+      const batch = executable.slice(0, this.maxConcurrency - this.running.size);
+      
+      await Promise.all(
+        batch.map(task => this.executeTask(task, results))
+      );
+    }
+    
+    return results;
+  }
+
+  // 获取可执行的任务（依赖已完成）
+  getExecutableTasks(tasks, graph) {
+    return tasks.filter(task => {
+      if (this.running.has(task.id) || this.completed.has(task.id)) {
+        return false;
+      }
+      return task.dependencies.every(dep => this.completed.has(dep));
+    });
+  }
+}</pre>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section bg-gradient-to-r from-m-bg to-white">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">五、总结</h2>
+            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">分解原则</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>✓ 单一职责</li>
+                        <li>✓ 依赖清晰</li>
+                        <li>✓ 粒度适中</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">调度能力</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>✓ 并行执行</li>
+                        <li>✓ 依赖管理</li>
+                        <li>✓ 失败重试</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">附录</h2>
+            
+            <h4 class="font-semibold text-gray-700 mb-2">参考文档</h4>
+            <ul class="text-sm text-gray-600 space-y-1">
+                <li>• <a href="05-agent-design.html" class="text-m-accent hover:underline">05 - Agent架构设计</a></li>
+                <li>• <a href="07-result-execution.html" class="text-m-accent hover:underline">07 - 结果执行与导出</a></li>
+            </ul>
+
+            <h4 class="font-semibold text-gray-700 mb-2 mt-4">更新记录</h4>
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="p-2 text-left">版本</th>
+                        <th class="p-2 text-left">日期</th>
+                        <th class="p-2 text-left">更新内容</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="p-2">v1.0</td>
+                        <td class="p-2">2026-04-10</td>
+                        <td class="p-2">初始版本</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        > 💡 **提示**: 本文档定义了任务分解与调度机制，是整理引擎的执行核心。
+
+        <div class="flex justify-between items-center pt-8 border-t">
+            <a href="05-agent-design.html" class="text-gray-500 hover:text-m-accent flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                上一篇：Agent架构设计
+            </a>
+            <a href="07-result-execution.html" class="text-m-accent hover:text-m-rose flex items-center">
+                下一篇：结果执行与导出
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

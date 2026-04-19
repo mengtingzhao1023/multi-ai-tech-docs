@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>04 - 知识库与标签体系 | 技术文档</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', 'Noto Sans SC', sans-serif; background: #F7F5F3; }
+        .doc-container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .section { background: white; border-radius: 12px; padding: 32px; margin-bottom: 24px; border: 1px solid #E8E4E0; }
+        .code-block { background: #1a1a2e; color: #eaeaea; padding: 20px; border-radius: 8px; overflow-x: auto; font-family: 'Fira Code', monospace; font-size: 14px; }
+        .tag-example { display: inline-block; padding: 4px 12px; border-radius: 16px; font-size: 12px; margin: 4px; }
+        .nav-link {
+            position: relative;
+            color: #8B8B8B;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #4A4A4A;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #B8A99A;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <nav class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-m-border z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <a href="../index.html" class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-m-accent to-m-sage flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="text-xl font-semibold text-m-text tracking-tight hidden sm:block">技术文档</span>
+                    </div>
+                </a>
+                
+                <!-- 导航链接 -->
+                <div class="flex items-center gap-6">
+                    <a href="../index.html" class="nav-link">返回主站</a>
+                    <a href="index.html" class="nav-link active text-m-text">文档首页</a>
+                    <a href="PRD.html" class="nav-link">PRD</a>
+                </div>
+                
+                <!-- 右侧操作区 -->
+                <div class="flex items-center gap-4">
+                    <a href="03-bad-case-analysis.html" class="flex items-center gap-1 text-gray-500 hover:text-m-accent transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        <span>上一篇</span>
+                    </a>
+                    <span class="text-sm text-m-text-light">04 / 08</span>
+                    <a href="05-agent-design.html" class="flex items-center gap-1 text-m-accent hover:text-m-rose transition-colors">
+                        <span>下一篇</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="doc-container pt-20">
+        <div class="text-center mb-12">
+            <div class="text-sm text-gray-500 mb-2">技术文档 04</div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">知识库与标签体系</h1>
+            <p class="text-gray-600">三层分类架构：规则+AI混合的标签系统设计</p>
+            <div class="mt-4 text-sm text-gray-500">
+                <span>版本: v1.0</span> | <span>更新日期: 2026-04-10</span> | <span>状态: 已完成</span>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">一、文档概述</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">1.1 背景</h3>
+            <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                标签体系是AI整理引擎的核心组件。一个设计良好的标签体系需要兼顾结构化与灵活性，既要满足统一分类的需求，又要支持用户的个性化表达。
+            </p>
+
+            <h3 class="font-semibold text-gray-700 mb-3">1.2 目标</h3>
+            <ul class="text-sm text-gray-600 space-y-1">
+                <li>• 设计三层标签体系架构</li>
+                <li>• 实现规则+AI混合的标签分配</li>
+                <li>• 构建知识图谱发现关联</li>
+                <li>• 支持用户自定义扩展</li>
+            </ul>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">二、标签体系架构</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">2.1 三层架构设计</h3>
+            <div class="grid md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-gradient-to-br from-m-accent/20 to-m-sage/20 p-4 rounded-lg">
+                    <h4 class="font-semibold text-gray-800 mb-2">一级：系统标签</h4>
+                    <p class="text-sm text-gray-600">平台预设，不可修改</p>
+                    <div class="mt-2">
+                        <span class="tag-example bg-m-accent text-white">工作</span>
+                        <span class="tag-example bg-m-sage text-white">学习</span>
+                        <span class="tag-example bg-m-blue text-white">生活</span>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-br from-m-sage/20 to-m-blue/20 p-4 rounded-lg">
+                    <h4 class="font-semibold text-gray-800 mb-2">二级：领域标签</h4>
+                    <p class="text-sm text-gray-600">用户自定义，AI辅助</p>
+                    <div class="mt-2">
+                        <span class="tag-example bg-m-sage text-white">编程</span>
+                        <span class="tag-example bg-m-blue text-white">设计</span>
+                        <span class="tag-example bg-m-rose text-white">管理</span>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-br from-m-blue/20 to-m-rose/20 p-4 rounded-lg">
+                    <h4 class="font-semibold text-gray-800 mb-2">三级：动态标签</h4>
+                    <p class="text-sm text-gray-600">AI自动生成，高频提取</p>
+                    <div class="mt-2">
+                        <span class="tag-example bg-gray-200 text-gray-700">Python</span>
+                        <span class="tag-example bg-gray-200 text-gray-700">AI工具</span>
+                        <span class="tag-example bg-gray-200 text-gray-700">效率</span>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="font-semibold text-gray-700 mb-3">2.2 标签层级关系</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="p-3 text-left">层级</th>
+                            <th class="p-3 text-left">来源</th>
+                            <th class="p-3 text-left">可修改</th>
+                            <th class="p-3 text-left">使用场景</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        <tr>
+                            <td class="p-3">系统标签</td>
+                            <td class="p-3">平台预设</td>
+                            <td class="p-3 text-red-600">否</td>
+                            <td class="p-3">基础分类维度</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">领域标签</td>
+                            <td class="p-3">用户+AI</td>
+                            <td class="p-3 text-green-600">是</td>
+                            <td class="p-3">专业领域细分</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">动态标签</td>
+                            <td class="p-3">AI提取</td>
+                            <td class="p-3 text-yellow-600">部分</td>
+                            <td class="p-3">内容关键词</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">三、规则引擎设计</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">3.1 设计目标</h3>
+            <p class="text-gray-600 text-sm mb-4">
+                规则引擎用于处理明确的、可模式化的分类场景，作为AI分类的补充和前置过滤。
+            </p>
+
+            <h3 class="font-semibold text-gray-700 mb-3">3.2 核心实现</h3>
+            <div class="code-block">
+<pre>// 用户自定义标签规则引擎
+class TagRuleEngine {
+  constructor() {
+    this.rules = {
+      // 关键词匹配规则
+      keywords: {
+        "AI工具": ["ChatGPT", "Claude", "Copilot", "Midjourney"],
+        "编程开发": ["代码", "算法", "Python", "JavaScript", "API"],
+        "产品设计": ["PRD", "原型", "用户调研", "交互设计"]
+      },
+      
+      // 正则匹配规则（更灵活）
+      regex: {
+        "会议记录": /会议|例会|周会|复盘|同步/i,
+        "技术方案": /方案|设计|架构|技术选型|评审/i,
+        "问题排查": /问题|故障|排查|解决|修复|bug/i
+      },
+      
+      // 组合规则（多条件）
+      composite: [
+        {
+          name: "AI编程",
+          conditions: [
+            { type: "keyword", value: "代码" },
+            { type: "keyword", value: "AI" }
+          ],
+          operator: "AND"
+        }
+      ]
+    };
+  }
+
+  // 执行规则匹配
+  match(text) {
+    const matchedTags = [];
+    
+    // 1. 关键词匹配
+    for (const [tag, keywords] of Object.entries(this.rules.keywords)) {
+      if (keywords.some(k => text.includes(k))) {
+        matchedTags.push({ tag, source: 'keyword', confidence: 0.9 });
+      }
+    }
+    
+    // 2. 正则匹配
+    for (const [tag, pattern] of Object.entries(this.rules.regex)) {
+      if (pattern.test(text)) {
+        matchedTags.push({ tag, source: 'regex', confidence: 0.85 });
+      }
+    }
+    
+    // 3. 组合规则
+    for (const rule of this.rules.composite) {
+      if (this.evaluateCompositeRule(rule, text)) {
+        matchedTags.push({ tag: rule.name, source: 'composite', confidence: 0.95 });
+      }
+    }
+    
+    return this.deduplicate(matchedTags);
+  }
+}</pre>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">四、知识图谱构建</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">4.1 设计目标</h3>
+            <p class="text-gray-600 text-sm mb-4">
+                基于标签共现关系，构建知识图谱，发现隐藏的知识关联，支持标签推荐和智能分类。
+            </p>
+
+            <h3 class="font-semibold text-gray-700 mb-3">4.2 核心实现</h3>
+            <div class="code-block">
+<pre>// 知识图谱构建
+class KnowledgeGraph {
+  constructor() {
+    this.nodes = new Map(); // 标签节点
+    this.edges = new Map(); // 关联边
+  }
+
+  // 从对话中提取标签共现关系
+  buildFromConversations(conversations) {
+    for (const conv of conversations) {
+      const tags = conv.tags;
+      
+      // 记录节点
+      for (const tag of tags) {
+        if (!this.nodes.has(tag)) {
+          this.nodes.set(tag, { name: tag, count: 0, conversations: [] });
+        }
+        this.nodes.get(tag).count++;
+        this.nodes.get(tag).conversations.push(conv.id);
+      }
+      
+      // 记录边（标签共现）
+      for (let i = 0; i < tags.length; i++) {
+        for (let j = i + 1; j < tags.length; j++) {
+          const edgeKey = [tags[i], tags[j]].sort().join('-');
+          if (!this.edges.has(edgeKey)) {
+            this.edges.set(edgeKey, { source: tags[i], target: tags[j], weight: 0 });
+          }
+          this.edges.get(edgeKey).weight++;
+        }
+      }
+    }
+  }
+
+  // 发现相关标签
+  findRelatedTags(tag, limit = 5) {
+    const related = [];
+    
+    for (const [key, edge] of this.edges) {
+      if (edge.source === tag) {
+        related.push({ tag: edge.target, weight: edge.weight });
+      } else if (edge.target === tag) {
+        related.push({ tag: edge.source, weight: edge.weight });
+      }
+    }
+    
+    return related
+      .sort((a, b) => b.weight - a.weight)
+      .slice(0, limit);
+  }
+
+  // 推荐标签（基于已有标签）
+  recommendTags(existingTags) {
+    const candidates = new Map();
+    
+    for (const tag of existingTags) {
+      const related = this.findRelatedTags(tag, 3);
+      for (const { tag: relatedTag, weight } of related) {
+        if (!existingTags.includes(relatedTag)) {
+          candidates.set(relatedTag, (candidates.get(relatedTag) || 0) + weight);
+        }
+      }
+    }
+    
+    return Array.from(candidates.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([tag]) => tag);
+  }
+}</pre>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section bg-gradient-to-r from-m-bg to-white">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">五、总结</h2>
+            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">标签体系</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>✓ 三层架构设计</li>
+                        <li>✓ 规则+AI混合</li>
+                        <li>✓ 知识图谱关联</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">核心能力</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>✓ 智能标签推荐</li>
+                        <li>✓ 用户自定义扩展</li>
+                        <li>✓ 动态标签提取</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">附录</h2>
+            
+            <h4 class="font-semibold text-gray-700 mb-2">参考文档</h4>
+            <ul class="text-sm text-gray-600 space-y-1">
+                <li>• <a href="03-bad-case-analysis.html" class="text-m-accent hover:underline">03 - Bad Case分析与优化</a></li>
+                <li>• <a href="05-agent-design.html" class="text-m-accent hover:underline">05 - Agent架构设计</a></li>
+            </ul>
+
+            <h4 class="font-semibold text-gray-700 mb-2 mt-4">更新记录</h4>
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="p-2 text-left">版本</th>
+                        <th class="p-2 text-left">日期</th>
+                        <th class="p-2 text-left">更新内容</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="p-2">v1.0</td>
+                        <td class="p-2">2026-04-10</td>
+                        <td class="p-2">初始版本</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        > 💡 **提示**: 本文档定义了标签体系的核心架构，是整理引擎的基础组件。
+
+        <div class="flex justify-between items-center pt-8 border-t">
+            <a href="03-bad-case-analysis.html" class="text-gray-500 hover:text-m-accent flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                上一篇：Bad Case分析与优化
+            </a>
+            <a href="05-agent-design.html" class="text-m-accent hover:text-m-rose flex items-center">
+                下一篇：Agent架构设计
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

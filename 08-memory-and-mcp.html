@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>08 - Memory与MCP | 技术文档</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', 'Noto Sans SC', sans-serif; background: #F7F5F3; }
+        .doc-container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .section { background: white; border-radius: 12px; padding: 32px; margin-bottom: 24px; border: 1px solid #E8E4E0; }
+        .code-block { background: #1a1a2e; color: #eaeaea; padding: 20px; border-radius: 8px; overflow-x: auto; font-family: 'Fira Code', monospace; font-size: 14px; }
+        .memory-layer { border-left: 4px solid; padding: 16px; margin-bottom: 12px; border-radius: 0 8px 8px 0; }
+        .memory-layer.short { border-color: #C9A9A6; background: #FDF8F7; }
+        .memory-layer.long { border-color: #A8B5A0; background: #F5F8F4; }
+        .memory-layer.external { border-color: #A8B4C4; background: #F5F7F8; }
+        .nav-link {
+            position: relative;
+            color: #8B8B8B;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #4A4A4A;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #B8A99A;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <nav class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-m-border z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <a href="../index.html" class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-m-accent to-m-sage flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="text-xl font-semibold text-m-text tracking-tight hidden sm:block">技术文档</span>
+                    </div>
+                </a>
+                
+                <!-- 导航链接 -->
+                <div class="flex items-center gap-6">
+                    <a href="../index.html" class="nav-link">返回主站</a>
+                    <a href="index.html" class="nav-link active text-m-text">文档首页</a>
+                    <a href="PRD.html" class="nav-link">PRD</a>
+                </div>
+                
+                <!-- 右侧操作区 -->
+                <div class="flex items-center gap-4">
+                    <a href="07-result-execution.html" class="flex items-center gap-1 text-gray-500 hover:text-m-accent transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        <span>上一篇</span>
+                    </a>
+                    <span class="text-sm text-m-text-light">08 / 08</span>
+                    <span class="text-gray-400">完</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="doc-container pt-20">
+        <div class="text-center mb-12">
+            <div class="text-sm text-gray-500 mb-2">技术文档 08</div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Memory与MCP</h1>
+            <p class="text-gray-600">让AI拥有记忆：短期记忆、长期记忆与模型上下文协议</p>
+            <div class="mt-4 text-sm text-gray-500">
+                <span>版本: v1.0</span> | <span>更新日期: 2026-04-10</span> | <span>状态: 已完成</span>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">一、文档概述</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">1.1 背景</h3>
+            <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                Memory系统让整理引擎能够记住用户偏好、历史决策，实现个性化整理。MCP（Model Context Protocol）则提供标准化的工具调用接口，让整理能力可以被其他AI应用使用。
+            </p>
+
+            <h3 class="font-semibold text-gray-700 mb-3">1.2 目标</h3>
+            <ul class="text-sm text-gray-600 space-y-1">
+                <li>• 设计三层Memory系统</li>
+                <li>• 实现个性化整理引擎</li>
+                <li>• 接入MCP协议</li>
+                <li>• 构建工具生态</li>
+            </ul>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">二、Memory系统设计</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">2.1 三层架构</h3>
+            <p class="text-gray-600 mb-4">Memory系统让整理引擎能够记住用户偏好、历史决策，实现个性化整理。</p>
+            
+            <div class="memory-layer short mb-4">
+                <h4 class="font-semibold text-gray-800 mb-2">短期记忆（Short-term Memory）</h4>
+                <p class="text-sm text-gray-600 mb-2">当前会话中的上下文信息，随会话结束而清除。</p>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• 当前整理任务的对话列表</li>
+                    <li>• 用户实时反馈（如纠错）</li>
+                    <li>• 中间计算结果缓存</li>
+                </ul>
+            </div>
+
+            <div class="memory-layer long mb-4">
+                <h4 class="font-semibold text-gray-800 mb-2">长期记忆（Long-term Memory）</h4>
+                <p class="text-sm text-gray-600 mb-2">持久化存储的用户偏好和历史数据，跨会话可用。</p>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• 用户标签使用习惯</li>
+                    <li>• 历史纠错记录</li>
+                    <li>• 整理偏好设置</li>
+                    <li>• 对话关联图谱</li>
+                </ul>
+            </div>
+
+            <div class="memory-layer external">
+                <h4 class="font-semibold text-gray-800 mb-2">外部记忆（External Memory）</h4>
+                <p class="text-sm text-gray-600 mb-2">超出当前系统的知识库，通过检索获取。</p>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• 统一标签库</li>
+                    <li>• 领域知识库</li>
+                    <li>• 同义词词典</li>
+                </ul>
+            </div>
+
+            <h3 class="font-semibold text-gray-700 mb-3">2.2 Memory对比</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="p-3 text-left">类型</th>
+                            <th class="p-3 text-left">存储位置</th>
+                            <th class="p-3 text-left">生命周期</th>
+                            <th class="p-3 text-left">用途</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        <tr>
+                            <td class="p-3">短期记忆</td>
+                            <td class="p-3">内存</td>
+                            <td class="p-3">会话级</td>
+                            <td class="p-3">临时上下文</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">长期记忆</td>
+                            <td class="p-3">IndexedDB</td>
+                            <td class="p-3">永久</td>
+                            <td class="p-3">用户偏好</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">外部记忆</td>
+                            <td class="p-3">向量数据库</td>
+                            <td class="p-3">永久</td>
+                            <td class="p-3">知识检索</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">三、MCP协议接入</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">3.1 MCP简介</h3>
+            <p class="text-gray-600 mb-4">MCP是Anthropic提出的开放协议，用于标准化AI模型与外部工具的交互。</p>
+            
+            <div class="bg-m-blue/10 border border-m-blue/30 rounded-lg p-4 mb-4">
+                <h4 class="font-semibold text-m-blue mb-2">MCP核心价值</h4>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• <strong>标准化接口：</strong>统一AI与工具的通信协议</li>
+                    <li>• <strong>可扩展性：</strong>轻松接入新工具和数据源</li>
+                    <li>• <strong>安全性：</strong>受控的工具访问权限</li>
+                    <li>• <strong>可移植性：</strong>一次开发，多处使用</li>
+                </ul>
+            </div>
+
+            <h3 class="font-semibold text-gray-700 mb-3">3.2 MCP服务器实现</h3>
+            <div class="code-block">
+<pre>// MCP服务器实现
+class MCPServer {
+  constructor() {
+    this.tools = new Map();
+    this.resources = new Map();
+  }
+
+  // 注册工具
+  registerTool(name, handler, schema) {
+    this.tools.set(name, { handler, schema });
+  }
+
+  // 处理MCP请求
+  async handleRequest(request) {
+    switch (request.method) {
+      case 'tools/list':
+        return this.listTools();
+      case 'tools/call':
+        return this.callTool(request.params);
+      default:
+        throw new Error(`未知方法: ${request.method}`);
+    }
+  }
+
+  // 列出可用工具
+  listTools() {
+    return Array.from(this.tools.entries()).map(([name, { schema }]) => ({
+      name,
+      description: schema.description,
+      parameters: schema.parameters
+    }));
+  }
+}</pre>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section bg-gradient-to-r from-m-bg to-white">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">四、总结</h2>
+            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">Memory系统</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>✓ 三层记忆架构</li>
+                        <li>✓ 个性化整理</li>
+                        <li>✓ 跨会话连续</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">MCP协议</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>✓ 标准化接口</li>
+                        <li>✓ 工具生态扩展</li>
+                        <li>✓ 跨应用集成</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        ---
+
+        <div class="section">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">附录</h2>
+            
+            <h4 class="font-semibold text-gray-700 mb-2">参考文档</h4>
+            <ul class="text-sm text-gray-600 space-y-1">
+                <li>• <a href="07-result-execution.html" class="text-m-accent hover:underline">07 - 结果执行与导出</a></li>
+                <li>• <a href="PRD.md" class="text-m-accent hover:underline">产品需求文档 (PRD)</a></li>
+            </ul>
+
+            <h4 class="font-semibold text-gray-700 mb-2 mt-4">更新记录</h4>
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="p-2 text-left">版本</th>
+                        <th class="p-2 text-left">日期</th>
+                        <th class="p-2 text-left">更新内容</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="p-2">v1.0</td>
+                        <td class="p-2">2026-04-10</td>
+                        <td class="p-2">初始版本</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        > 💡 **提示**: 本文档是技术文档系列的最后一份，涵盖了Memory和MCP两个高级特性。
+
+        <div class="flex justify-between items-center pt-8 border-t">
+            <a href="07-result-execution.html" class="text-gray-500 hover:text-m-accent flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                上一篇：结果执行与导出
+            </a>
+            <a href="index.html" class="text-m-accent hover:text-m-rose flex items-center">
+                返回文档首页
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

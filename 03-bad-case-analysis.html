@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>03 - Bad Case分析与优化 | 技术文档</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', 'Noto Sans SC', sans-serif; background: #F7F5F3; }
+        .doc-container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .section { background: white; border-radius: 12px; padding: 32px; margin-bottom: 24px; border: 1px solid #E8E4E0; }
+        .code-block { background: #1a1a2e; color: #eaeaea; padding: 20px; border-radius: 8px; overflow-x: auto; font-family: 'Fira Code', monospace; font-size: 14px; }
+        .case-card { border-left: 4px solid #C9A9A6; background: #FDF8F7; padding: 16px; margin-bottom: 12px; border-radius: 0 8px 8px 0; }
+        .improvement-card { border-left: 4px solid #A8B5A0; background: #F5F8F4; padding: 16px; margin-bottom: 12px; border-radius: 0 8px 8px 0; }
+        .nav-link {
+            position: relative;
+            color: #8B8B8B;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #4A4A4A;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #B8A99A;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-m-border z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <a href="../index.html" class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-m-accent to-m-sage flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="text-xl font-semibold text-m-text tracking-tight hidden sm:block">技术文档</span>
+                    </div>
+                </a>
+                
+                <!-- 导航链接 -->
+                <div class="flex items-center gap-6">
+                    <a href="../index.html" class="nav-link">返回主站</a>
+                    <a href="index.html" class="nav-link active text-m-text">文档首页</a>
+                    <a href="PRD.html" class="nav-link">PRD</a>
+                </div>
+                
+                <!-- 右侧操作区 -->
+                <div class="flex items-center gap-4">
+                    <a href="02-data-evaluation.html" class="flex items-center gap-1 text-gray-500 hover:text-m-accent transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        <span>上一篇</span>
+                    </a>
+                    <span class="text-sm text-m-text-light">03 / 08</span>
+                    <a href="04-knowledge-base.html" class="flex items-center gap-1 text-m-accent hover:text-m-rose transition-colors">
+                        <span>下一篇</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="doc-container pt-20">
+        <!-- 文档头部信息 -->
+        <div class="text-center mb-12">
+            <div class="text-sm text-gray-500 mb-2">技术文档 03</div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Bad Case分析与优化</h1>
+            <p class="text-gray-600">从错误中学习：分类错误的案例分析、根因定位与迭代优化</p>
+            <div class="mt-4 text-sm text-gray-500">
+                <span>版本: v1.0</span> | <span>更新日期: 2026-04-10</span> | <span>状态: 已完成</span>
+            </div>
+        </div>
+
+        ---
+
+        <!-- 一、概述 -->
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">一、文档概述</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">1.1 背景</h3>
+            <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                任何AI系统都无法做到100%准确。Bad Case（错误案例）是系统优化的重要数据来源。通过系统性地收集、分析Bad Case，可以持续改进整理引擎的效果。
+            </p>
+
+            <h3 class="font-semibold text-gray-700 mb-3">1.2 目标</h3>
+            <ul class="text-sm text-gray-600 space-y-1">
+                <li>• 建立Bad Case分类体系</li>
+                <li>• 设计用户反馈收集机制</li>
+                <li>• 实现闭环优化流程</li>
+                <li>• 构建标签纠错监控系统</li>
+            </ul>
+        </div>
+
+        ---
+
+        <!-- 二、典型Bad Case分类 -->
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">二、典型Bad Case分类</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">2.1 错误类型分析</h3>
+            
+            <div class="case-card">
+                <h4 class="font-semibold text-gray-800 mb-2">Case 1: 多主题混合对话</h4>
+                <p class="text-sm text-gray-600 mb-2"><strong>内容：</strong>"今天学习了Python的列表推导式，顺便整理了下周的工作计划，晚上还要准备孩子的家长会..."</p>
+                <p class="text-sm text-gray-600 mb-2"><strong>错误分类：</strong>仅标记为"学习"，忽略了"工作"和"生活"</p>
+                <p class="text-sm text-red-600"><strong>根因：</strong>单标签分类模型无法处理多主题内容</p>
+            </div>
+
+            <div class="case-card">
+                <h4 class="font-semibold text-gray-800 mb-2">Case 2: 专业术语歧义</h4>
+                <p class="text-sm text-gray-600 mb-2"><strong>内容：</strong>"Java的Spring框架和床垫的Spring支撑系统有什么区别？"</p>
+                <p class="text-sm text-gray-600 mb-2"><strong>错误分类：</strong>标记为"生活/家居"，实际应为"技术/编程"</p>
+                <p class="text-sm text-red-600"><strong>根因：</strong>关键词"Spring"被误判，缺乏上下文理解</p>
+            </div>
+
+            <div class="case-card">
+                <h4 class="font-semibold text-gray-800 mb-2">Case 3: 口语化表达</h4>
+                <p class="text-sm text-gray-600 mb-2"><strong>内容：</strong>"那个啥，帮我看看这个bug咋回事，急！"</p>
+                <p class="text-sm text-gray-600 mb-2"><strong>错误分类：</strong>标记为"其他"，未识别出技术内容</p>
+                <p class="text-sm text-red-600"><strong>根因：</strong>口语化、缺乏关键词，规则引擎失效</p>
+            </div>
+
+            <h3 class="font-semibold text-gray-700 mb-3">2.2 错误类型统计</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="p-3 text-left">错误类型</th>
+                            <th class="p-3 text-left">占比</th>
+                            <th class="p-3 text-left">根因</th>
+                            <th class="p-3 text-left">优化难度</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        <tr>
+                            <td class="p-3">多主题混合</td>
+                            <td class="p-3">35%</td>
+                            <td class="p-3">单标签限制</td>
+                            <td class="p-3 text-yellow-600">中</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">术语歧义</td>
+                            <td class="p-3">25%</td>
+                            <td class="p-3">上下文缺失</td>
+                            <td class="p-3 text-green-600">低</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">口语化表达</td>
+                            <td class="p-3">20%</td>
+                            <td class="p-3">规则覆盖不足</td>
+                            <td class="p-3 text-yellow-600">中</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">标签缺失</td>
+                            <td class="p-3">15%</td>
+                            <td class="p-3">召回率不足</td>
+                            <td class="p-3 text-green-600">低</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">其他</td>
+                            <td class="p-3">5%</td>
+                            <td class="p-3">-</td>
+                            <td class="p-3 text-red-600">高</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        ---
+
+        <!-- 三、优化方案 -->
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">三、优化方案与效果</h2>
+
+            <h3 class="font-semibold text-gray-700 mb-3">3.1 针对性优化</h3>
+
+            <div class="improvement-card">
+                <h4 class="font-semibold text-gray-800 mb-2">优化1: 多标签分类</h4>
+                <p class="text-sm text-gray-600 mb-2"><strong>方案：</strong>从单标签改为多标签分类，允许一个对话属于多个类别</p>
+                <p class="text-sm text-green-600"><strong>效果：</strong>Case 1问题解决，多主题识别准确率提升至92%</p>
+            </div>
+
+            <div class="improvement-card">
+                <h4 class="font-semibold text-gray-800 mb-2">优化2: 上下文感知</h4>
+                <p class="text-sm text-gray-600 mb-2"><strong>方案：</strong>引入上下文窗口，结合前后对话内容判断语义</p>
+                <p class="text-sm text-green-600"><strong>效果：</strong>Case 2问题解决，歧义识别准确率提升至88%</p>
+            </div>
+
+            <div class="improvement-card">
+                <h4 class="font-semibold text-gray-800 mb-2">优化3: 口语化Prompt</h4>
+                <p class="text-sm text-gray-600 mb-2"><strong>方案：</strong>优化AI Prompt，明确告知处理口语化、非正式表达</p>
+                <p class="text-sm text-green-600"><strong>效果：</strong>Case 3问题解决，口语内容识别准确率提升至85%</p>
+            </div>
+
+            <h3 class="font-semibold text-gray-700 mb-3">3.2 优化效果追踪</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="p-3 text-left">优化项</th>
+                            <th class="p-3 text-left">优化前</th>
+                            <th class="p-3 text-left">优化后</th>
+                            <th class="p-3 text-left">提升</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        <tr>
+                            <td class="p-3">多主题识别率</td>
+                            <td class="p-3">65%</td>
+                            <td class="p-3">92%</td>
+                            <td class="p-3 text-green-600">+27%</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">歧义识别率</td>
+                            <td class="p-3">72%</td>
+                            <td class="p-3">88%</td>
+                            <td class="p-3 text-green-600">+16%</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3">口语内容识别率</td>
+                            <td class="p-3">68%</td>
+                            <td class="p-3">85%</td>
+                            <td class="p-3 text-green-600">+17%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        ---
+
+        <!-- 四、用户反馈收集 -->
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">四、用户反馈收集机制</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">4.1 设计目标</h3>
+            <p class="text-gray-600 text-sm mb-4">
+                Bad Case 的数据来源依赖于用户的主动反馈。我们在产品界面中嵌入多维度反馈入口，确保用户能够方便地报告错误。
+            </p>
+
+            <h3 class="font-semibold text-gray-700 mb-3">4.2 反馈入口设计</h3>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-gray-800 mb-2">反馈入口</h4>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• 对话卡片上的"标签有误"按钮</li>
+                        <li>• 整理结果页的"纠错"悬浮按钮</li>
+                        <li>• 批量操作中的"标记错误"选项</li>
+                        <li>• 导出前的"确认标签"弹窗</li>
+                    </ul>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-gray-800 mb-2">反馈信息</h4>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• 错误类型（分类/标签缺失/多余）</li>
+                        <li>• 用户期望的正确标签</li>
+                        <li>• 纠错原因（可选填）</li>
+                        <li>• 用户ID和时间戳</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 class="font-semibold text-gray-700 mb-3">4.3 反馈收集实现</h3>
+            <div class="code-block">
+<pre>// 用户反馈收集器
+class UserFeedbackCollector {
+  // 收集标签纠错反馈
+  async collectTagCorrection(dialogId, originalTags, correctedTags, reason) {
+    const feedback = {
+      type: 'TAG_CORRECTION',
+      dialogId,
+      originalTags,
+      correctedTags,
+      reason,
+      timestamp: Date.now(),
+      userId: getCurrentUserId()
+    };
+    
+    // 存入反馈队列
+    await this.feedbackQueue.push(feedback);
+    
+    // 实时分析是否为高频错误模式
+    if (this.isHighFrequencyPattern(originalTags, correctedTags)) {
+      this.triggerAlert(feedback);
+    }
+    
+    return feedback.id;
+  }
+  
+  // 判断是否为高频错误模式
+  isHighFrequencyPattern(original, corrected) {
+    const key = `${original.join(',')}->${corrected.join(',')}`;
+    const count = this.patternCounter.get(key) || 0;
+    this.patternCounter.set(key, count + 1);
+    return count >= 3; // 3次以上视为高频
+  }
+}</pre>
+            </div>
+        </div>
+
+        ---
+
+        <!-- 五、监控与闭环 -->
+        <div class="section">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">五、标签纠错监控与闭环</h2>
+            
+            <h3 class="font-semibold text-gray-700 mb-3">5.1 监控看板指标</h3>
+            <div class="grid grid-cols-4 gap-4 mb-6">
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-m-rose">8.5%</div>
+                    <div class="text-xs text-gray-500">纠错率</div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-m-sage">92%</div>
+                    <div class="text-xs text-gray-500">首标准确率</div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-m-blue">156</div>
+                    <div class="text-xs text-gray-500">本周纠错数</div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-m-accent">23</div>
+                    <div class="text-xs text-gray-500">新增高频模式</div>
+                </div>
+            </div>
+
+            <h3 class="font-semibold text-gray-700 mb-3">5.2 闭环优化流程</h3>
+            <div class="code-block">
+<pre>// Bad Case闭环优化系统
+class BadCaseManager {
+  constructor() {
+    this.badCases = [];
+    this.optimizationLog = [];
+    this.feedbackCollector = new UserFeedbackCollector();
+    this.monitor = new TagCorrectionMonitor();
+  }
+
+  // 1. 从用户反馈中收集Bad Case
+  async collectFromUserFeedback(feedback) {
+    const badCase = {
+      id: generateId(),
+      content: await this.getDialogContent(feedback.dialogId),
+      prediction: { tags: feedback.originalTags },
+      groundTruth: { tags: feedback.correctedTags },
+      timestamp: new Date(),
+      source: 'USER_FEEDBACK',
+      category: this.categorizeError(feedback.originalTags, feedback.correctedTags)
+    };
+    this.badCases.push(badCase);
+    return badCase.id;
+  }
+
+  // 2. 定期分析（结合监控数据）
+  async analyzeWeekly() {
+    const monitorReport = await this.monitor.generateWeeklyReport();
+    
+    return {
+      total: this.badCases.length,
+      topPatterns: monitorReport.topPatterns,
+      optimizationSuggestions: this.monitor.generateOptimizationSuggestions(monitorReport.topPatterns)
+    };
+  }
+
+  // 3. Prompt优化与A/B测试
+  optimizePrompt(errorPattern) {
+    const newPrompt = this.adjustPrompt(basePrompt, errorPattern);
+    const testResult = this.abTest(newPrompt, basePrompt);
+    
+    if (testResult.improvement > 0.05) {
+      this.deployPrompt(newPrompt);
+    }
+  }
+}</pre>
+            </div>
+        </div>
+
+        ---
+
+        <!-- 六、总结 -->
+        <div class="section bg-gradient-to-r from-m-bg to-white">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">六、总结</h2>
+            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">Bad Case管理</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>✓ 分类体系建立</li>
+                        <li>✓ 用户反馈收集</li>
+                        <li>✓ 高频模式识别</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">闭环优化</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>✓ 监控看板实时追踪</li>
+                        <li>✓ Prompt持续优化</li>
+                        <li>✓ A/B测试验证效果</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        ---
+
+        <!-- 附录 -->
+        <div class="section">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">附录</h2>
+            
+            <h4 class="font-semibold text-gray-700 mb-2">参考文档</h4>
+            <ul class="text-sm text-gray-600 space-y-1">
+                <li>• <a href="02-data-evaluation.html" class="text-m-accent hover:underline">02 - 数据评测与效果验证</a></li>
+                <li>• <a href="04-knowledge-base.html" class="text-m-accent hover:underline">04 - 知识库与标签体系</a></li>
+            </ul>
+
+            <h4 class="font-semibold text-gray-700 mb-2 mt-4">更新记录</h4>
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="p-2 text-left">版本</th>
+                        <th class="p-2 text-left">日期</th>
+                        <th class="p-2 text-left">更新内容</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="p-2">v1.0</td>
+                        <td class="p-2">2026-04-10</td>
+                        <td class="p-2">初始版本</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        > 💡 **提示**: 本文档定义了Bad Case处理流程，是持续优化整理引擎效果的关键机制。
+
+        <!-- 导航 -->
+        <div class="flex justify-between items-center pt-8 border-t">
+            <a href="02-data-evaluation.html" class="text-gray-500 hover:text-m-accent flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                上一篇：数据评测与效果验证
+            </a>
+            <a href="04-knowledge-base.html" class="text-m-accent hover:text-m-rose flex items-center">
+                下一篇：知识库与标签体系
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
